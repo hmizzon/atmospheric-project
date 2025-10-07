@@ -42,7 +42,6 @@
         }
 
         .earth-container {
-            position: relative;
             width: 200px;
             height: 200px;
             margin: 20px auto;
@@ -53,30 +52,15 @@
             height: 100%;
             border-radius: 50%;
             background-color: var(--habitable);
-            transition: all 0.5s ease;
-            position: relative;
-            overflow: hidden;
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/800px-The_Earth_seen_from_Apollo_17.jpg');
-            background-size: cover;
+            transition: background-color 0.5s ease;
         }
 
-        .earth-container::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            z-index: 1;
+        .hot {
+            background-color: var(--too-hot) !important;
         }
 
-        .hot::before {
-            background-color: rgba(255, 69, 0, 0.5);
-        }
-
-        .cold::before {
-            background-color: rgba(173, 216, 230, 0.5);
+        .cold {
+            background-color: var(--too-cold) !important;
         }
 
         .slider-container {
@@ -393,16 +377,16 @@
                 }
             ];
 
-            // Filtrer les événements impossibles (ex. : CO₂ déjà à 90%)
+            // Filtrer les événements impossibles
             const possibleEvents = events.filter(event => {
                 if (event.type === "volcano") return event.co2 > 0;
                 if (event.type === "comet") return event.h2o > 0;
-                if (event.type === "algae") return event.co2 < 0; // Toujours possible
+                if (event.type === "algae") return event.co2 < 0;
                 if (event.type === "storm") return event.h2o > 0;
                 return true;
             });
 
-            if (possibleEvents.length === 0) return; // Aucun événement possible
+            if (possibleEvents.length === 0) return;
 
             const randomEvent = possibleEvents[Math.floor(Math.random() * possibleEvents.length)];
             addEventToLog(randomEvent.message);
@@ -467,7 +451,7 @@
                 }
             }, 1000);
 
-            // Générer un événement toutes les 10-20 secondes
+            // Générer un événement toutes les 15 secondes
             eventInterval = setInterval(generateRandomEvent, 15000);
         }
 
