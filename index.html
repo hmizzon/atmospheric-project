@@ -63,6 +63,16 @@
             background-color: var(--too-cold) !important;
         }
 
+        .critical-cold {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
         .slider-container {
             margin: 15px 0;
             width: 100%;
@@ -110,6 +120,11 @@
         .event {
             margin-bottom: 5px;
             color: #555;
+        }
+
+        .warning {
+            color: #e74c3c;
+            font-weight: bold;
         }
 
         .instructions {
@@ -225,10 +240,10 @@
         <div class="modal-content">
             <span class="close-modal" id="close-modal">&times;</span>
             <h2>Rôle des Gaz dans l'Atmosphère</h2>
-            <p><strong>CO₂</strong> : Gaz à effet de serre. Trop de CO₂ réchauffe la planète (comme sur Vénus).</p>
+            <p><strong>CO₂</strong> : Gaz à effet de serre. Sans CO₂ (0 %), la Terre gèle rapidement, comme Mars !</p>
             <p><strong>N₂</strong> : Gaz inerte. Stabilise l'atmosphère mais n'affecte pas directement la température.</p>
             <p><strong>H₂O</strong> : Vapeur d'eau. Contribue à l'effet de serre mais aussi aux nuages (refroidissement).</p>
-            <p><strong>Équilibre</strong> : Sur Terre primitive, un mélange de ces gaz a permis la vie !</p>
+            <p><strong>Équilibre</strong> : Sur Terre primitive, un mélange de ces gaz a permis la vie.</p>
         </div>
     </div>
 
@@ -320,24 +335,31 @@
         function calculateTemperature() {
             const co2 = parseInt(co2Slider.value);
             const h2o = parseInt(h2oSlider.value);
-            // Si CO₂ = 0 %, la température chute en dessous de 0°C (scénario "trop froid")
+
+            // Si CO₂ = 0 %, température forcée à -10°C (trop froid)
             if (co2 === 0) {
-                return -10; // Température forcée à -10°C
+                return -10;
             }
-            // Sinon, calcul normal (CO₂ réchauffe, H₂O refroidit légèrement)
+
+            // Sinon, calcul normal
             return 20 + (co2 * 0.6) - (h2o * 0.3);
         }
-
 
         function updateEarthColor(temperature) {
             if (temperature > 50) {
                 earth.classList.add('hot');
-                earth.classList.remove('cold');
+                earth.classList.remove('cold', 'critical-cold');
             } else if (temperature < 0) {
                 earth.classList.add('cold');
                 earth.classList.remove('hot');
+                // Ajouter l'effet de clignotement si CO₂ = 0
+                if (parseInt(co2Slider.value) === 0) {
+                    earth.classList.add('critical-cold');
+                } else {
+                    earth.classList.remove('critical-cold');
+                }
             } else {
-                earth.classList.remove('hot', 'cold');
+                earth.classList.remove('hot', 'cold', 'critical-cold');
             }
         }
 
@@ -394,6 +416,11 @@
             const randomEvent = possibleEvents[Math.floor(Math.random() * possibleEvents.length)];
             addEventToLog(randomEvent.message);
 
+            // Ajouter un avertissement si CO₂ est très bas
+            if (co2 <= 5 && co2 > 0) {
+                addEventToLog("⚠️ Attention : le CO₂ est très bas ! Risque de glaciation.", "warning");
+            }
+
             // Appliquer l'effet de l'événement
             if (randomEvent.type === "volcano") {
                 co2Slider.value = parseInt(co2Slider.value) + randomEvent.co2;
@@ -408,10 +435,10 @@
             updateValues();
         }
 
-        // Ajouter un événement au journal
-        function addEventToLog(message) {
+        // Ajouter un événement au journal (avec option pour les avertissements)
+        function addEventToLog(message, type = "normal") {
             const eventElement = document.createElement('div');
-            eventElement.className = 'event';
+            eventElement.className = `event ${type}`;
             eventElement.textContent = message;
             eventLog.appendChild(eventElement);
             eventLog.scrollTop = eventLog.scrollHeight;
