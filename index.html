@@ -339,11 +339,11 @@
                 h2oValue.textContent = h2oSlider.value;
 
                 // Ajouter un message dans le journal
-                if (totalGas < 100) {
-                    addEventToLog(`⚠️ Ajustement automatique : la somme des gaz était de ${totalGas}%. Les valeurs ont été augmentées pour atteindre 100%.`);
-                } else {
-                    addEventToLog(`⚠️ Ajustement automatique : la somme des gaz était de ${totalGas}%. Les valeurs ont été réduites pour atteindre 100%.`);
-                }
+                //if (totalGas < 100) {
+                //    addEventToLog(`⚠️ Ajustement automatique : la somme des gaz était de ${totalGas}%. Les valeurs ont été augmentées pour atteindre 100%.`);
+                //} else {
+                //    addEventToLog(`⚠️ Ajustement automatique : la somme des gaz était de ${totalGas}%. Les valeurs ont été réduites pour atteindre 100%.`);
+                //}
 
                 // Recalculer la somme après ajustement
                 totalGas = parseInt(co2Slider.value) + parseInt(n2Slider.value) + parseInt(h2oSlider.value);
@@ -353,7 +353,10 @@
             // Calculer la température
             const temperature = calculateTemperature();
             temperatureText.textContent = `Température : ${temperature.toFixed(1)}°C`;
-
+            // Avertissement si CO₂ approche du seuil critique
+            if (co2 > 70 && co2 <= 80 && !earth.classList.contains('runaway')) {
+                addEventToLog("⚠️ Attention : CO₂ > 70% ! Risque d'emballement de l'effet de serre.", "warning");
+            }
             // Mettre à jour la couleur de la Terre
             updateEarthColor(temperature);
 
@@ -369,10 +372,11 @@
             if (co2 === 0) {
                 return -10;
             }
-            // Emballement de l'effet de serre si CO₂ > 80%
+            // Formule révisée pour un emballement visible
             else if (co2 > 80) {
+                const baseTemp = 20 + (co2 * 0.6) - (h2o * 0.3);
                 const excessCO2 = co2 - 80;
-                return 20 + (co2 * 0.6) - (h2o * 0.3) + (excessCO2 * excessCO2 * 0.1); // Augmentation exponentielle
+                return baseTemp + (excessCO2 * 5); // Augmentation linéaire forte
             }
             // Calcul normal sinon
             else {
@@ -381,25 +385,23 @@
         }
 
         function updateEarthColor(temperature) {
-            if (temperature > 100) { // Emballement de l'effet de serre
-                earth.classList.add('runaway');
-                earth.classList.remove('hot', 'cold', 'critical-cold');
+        // Supprimer toutes les classes avant d'appliquer les nouvelles
+        earth.classList.remove('hot', 'cold', 'critical-cold', 'runaway');
+
+        if (temperature > 100) { // Emballement
+            earth.classList.add('runaway');
+            addEventToLog("⚠️ EMBALLEMENT DE L'EFFET DE SERRE ! Température > 100°C (comme Vénus).");
+        }
+        else if (temperature > 50) { // Trop chaud
+            earth.classList.add('hot');
+        }
+        else if (temperature < 0) { // Trop froid
+            earth.classList.add('cold');
+            if (parseInt(co2Slider.value) === 0) {
+                earth.classList.add('critical-cold');
             }
-            else if (temperature > 50) {
-                earth.classList.add('hot');
-                earth.classList.remove('cold', 'critical-cold', 'runaway');
-            }
-            else if (temperature < 0) {
-                earth.classList.add('cold');
-                earth.classList.remove('hot', 'runaway');
-                if (parseInt(co2Slider.value) === 0) {
-                    earth.classList.add('critical-cold');
-                } else {
-                    earth.classList.remove('critical-cold');
-                }
-            } else {
-                earth.classList.remove('hot', 'cold', 'critical-cold', 'runaway');
-            }
+        }
+        // Sinon, reste en couleur habitable (bleu)
         }
 
         function updateScore(temperature) {
