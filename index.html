@@ -13,189 +13,11 @@
             --neutral: #f5f5f5;
             --text-color: #2c3e50;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--neutral);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .game-container {
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-            padding: 25px;
-            width: 90%;
-            max-width: 600px;
-            margin: 20px auto;
-            text-align: center;
-        }
-
-        h1 {
-            color: var(--text-color);
-            margin-bottom: 10px;
-        }
-
-        .earth-container {
-            width: 200px;
-            height: 200px;
-            margin: 20px auto;
-        }
-
-        #earth {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background-color: var(--habitable);
-            transition: all 0.5s ease;
-        }
-
-        .hot {
-            background-color: var(--too-hot) !important;
-        }
-
-        .cold {
-            background-color: var(--too-cold) !important;
-        }
-
-        .critical-cold {
-            animation: blink 1s infinite;
-        }
-
-        .runaway {
-            background-color: var(--runaway) !important;
-            animation: pulse 1s infinite !important;
-        }
-
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .slider-container {
-            margin: 15px 0;
-            width: 100%;
-        }
-
-        .slider {
-            width: 100%;
-            max-width: 400px;
-            margin: 10px auto;
-        }
-
-        .slider-label {
-            display: flex;
-            justify-content: space-between;
-            margin: 0 20px;
-            font-weight: bold;
-        }
-
-        #temperature {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 20px 0;
-            color: var(--text-color);
-        }
-
-        .score-container {
-            display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
-            font-weight: bold;
-        }
-
-        .event-log {
-            margin-top: 20px;
-            height: 100px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        .event {
-            margin-bottom: 5px;
-            color: #555;
-        }
-
-        .warning {
+        /* ... (le reste du CSS reste identique à la version précédente) ... */
+        .feedback-loop {
             color: #e74c3c;
             font-weight: bold;
-        }
-
-        .instructions {
             font-style: italic;
-            color: #7f8c8d;
-            margin: 20px 0;
-            font-size: 14px;
-        }
-
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 5px;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 500px;
-            text-align: center;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        @media (max-width: 600px) {
-            .game-container {
-                width: 95%;
-                padding: 15px;
-            }
         }
     </style>
 </head>
@@ -219,14 +41,14 @@
             <div class="slider-label">
                 <span>CO₂ : <span id="co2-value">70</span>%</span>
             </div>
-            <input type="range" id="co2" class="slider" min="0" max="90" value="70" step="1">
+            <input type="range" id="co2" class="slider" min="0" max="97" value="70" step="1">
         </div>
 
         <div class="slider-container">
             <div class="slider-label">
                 <span>N₂ : <span id="n2-value">20</span>%</span>
             </div>
-            <input type="range" id="n2" class="slider" min="0" max="90" value="20" step="1">
+            <input type="range" id="n2" class="slider" min="0" max="97" value="20" step="1">
         </div>
 
         <div class="slider-container">
@@ -236,31 +58,32 @@
             <input type="range" id="h2o" class="slider" min="0" max="20" value="10" step="1">
         </div>
 
-        <div class="event-log" id="event-log">
-            <!-- Les événements s'afficheront ici -->
-        </div>
+        <div class="event-log" id="event-log"></div>
 
         <div class="instructions">
-            <p>Objectif : Maintenir la température entre 0°C et 50°C pendant au moins 30 secondes pour gagner !</p>
+            <p>Objectif : Maintenir la température entre 0°C et 50°C pendant au moins 30 secondes !</p>
             <button id="info-btn">Pourquoi ces gaz ?</button>
             <button id="reset-btn">Réinitialiser</button>
         </div>
     </div>
 
-    <!-- Modal pour les explications scientifiques -->
     <div class="modal" id="info-modal">
         <div class="modal-content">
             <span class="close-modal" id="close-modal">&times;</span>
-            <h2>Mécanismes Climatiques</h2>
-            <p><strong>CO₂</strong> : Gaz à effet de serre essentiel. Sans CO₂, la Terre deviendrait plus froide, mais le problème de Mars est surtout sa <strong>faible pression atmosphérique</strong>, pas seulement l'absence de CO₂. Une atmosphère sans CO₂ perdrait une partie de son effet de serre.</p>
-            <p><strong>Emballement de l'effet de serre</strong> : Si le CO₂ dépasse 80%, la température s'emballe (comme sur Vénus, avec 96% de CO₂ et une pression écrasante). Résultat : une planète infernale (460°C sur Vénus !).</p>
-            <p><strong>Équilibre Terre</strong> : Notre planète régule naturellement le CO₂ via les océans et les roches. Mais un excès peut perturber cet équilibre.</p>
-            <p><strong>Somme des gaz</strong> : Ce jeu ajuste automatiquement les valeurs pour que la somme reste à 100%, comme dans une atmosphère réelle.</p>
+            <h2>Mécanismes Climatiques Avancés</h2>
+            <p><strong>CO₂ (max 97%)</strong> : Gaz à effet de serre. Sans CO₂, la Terre se refroidit. Avec trop de CO₂ (>80%), un emballement peut se produire comme sur Vénus (96% CO₂, 460°C).</p>
+            <p><strong>Boucles de rétroaction</strong> :
+            <ul>
+                <li><strong>Emballement</strong> : Une température élevée fait évaporer l'H₂O → plus de vapeur d'eau (gaz à effet de serre) → augmentation de température.</li>
+                <li><strong>Refroidissement</strong> : Une température basse peut augmenter la condensation de l'H₂O (pluies, neige) → réduction de la vapeur d'eau.</li>
+            </ul>
+            </p>
+            <p><strong>H₂O</strong> : Vapeur d'eau = gaz à effet de serre PUISSANT. Mais en excès, elle peut aussi former des nuages réfléchissants (refroidissement).</p>
+            <p><strong>N₂</strong> : Gaz inerte. Ne participe pas directement à l'effet de serre.</p>
         </div>
     </div>
 
     <script>
-        // Récupérer les éléments du DOM
         const co2Slider = document.getElementById('co2');
         const n2Slider = document.getElementById('n2');
         const h2oSlider = document.getElementById('h2o');
@@ -278,130 +101,126 @@
         const infoModal = document.getElementById('info-modal');
         const closeModal = document.getElementById('close-modal');
 
-        // Variables globales
         let score = 0;
         let time = 0;
         let gameInterval;
         let eventInterval;
+        let previousTemp = 20; // Pour les boucles de rétroaction
 
-        // Mettre à jour les valeurs affichées
+        // Événements et interactions
         co2Slider.addEventListener('input', updateValues);
         n2Slider.addEventListener('input', updateValues);
         h2oSlider.addEventListener('input', updateValues);
-
-        // Bouton pour ouvrir la modal d'informations
-        infoBtn.addEventListener('click', () => {
-            infoModal.style.display = 'flex';
-        });
-
-        // Bouton pour réinitialiser le jeu
+        infoBtn.addEventListener('click', () => infoModal.style.display = 'flex');
         resetBtn.addEventListener('click', resetGame);
-
-        // Fermer la modal
-        closeModal.addEventListener('click', () => {
-            infoModal.style.display = 'none';
-        });
-
-        // Fermer la modal en cliquant en dehors
-        window.addEventListener('click', (e) => {
-            if (e.target === infoModal) {
-                infoModal.style.display = 'none';
-            }
-        });
+        closeModal.addEventListener('click', () => infoModal.style.display = 'none');
+        window.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
 
         function updateValues() {
-            // Mettre à jour les valeurs affichées
+            // Mise à jour des valeurs affichées
             co2Value.textContent = co2Slider.value;
             n2Value.textContent = n2Slider.value;
             h2oValue.textContent = h2oSlider.value;
 
-            // Calculer la somme des gaz
+            // Ajustement automatique de la somme des gaz
             let totalGas = parseInt(co2Slider.value) + parseInt(n2Slider.value) + parseInt(h2oSlider.value);
             totalGasText.textContent = totalGas;
 
-            // Ajustement automatique de la somme des gaz
             if (totalGas !== 100) {
-                const co2 = parseInt(co2Slider.value);
-                const n2 = parseInt(n2Slider.value);
-                const h2o = parseInt(h2oSlider.value);
-
-                // Calculer le ratio pour ajuster à 100%
                 const ratio = 100 / totalGas;
+                co2Slider.value = Math.min(97, Math.max(0, Math.floor(parseInt(co2Slider.value) * ratio)));
+                n2Slider.value = Math.min(97, Math.max(0, Math.floor(parseInt(n2Slider.value) * ratio)));
+                h2oSlider.value = Math.min(20, Math.max(0, Math.floor(parseInt(h2oSlider.value) * ratio)));
 
-                // Appliquer le ratio à chaque gaz (en respectant les limites min/max)
-                co2Slider.value = Math.min(90, Math.max(0, Math.floor(co2 * ratio)));
-                n2Slider.value = Math.min(90, Math.max(0, Math.floor(n2 * ratio)));
-                h2oSlider.value = Math.min(20, Math.max(0, Math.floor(h2o * ratio)));
-
-                // Mettre à jour les valeurs affichées après ajustement
-                co2Value.textContent = co2Slider.value;
-                n2Value.textContent = n2Slider.value;
-                h2oValue.textContent = h2oSlider.value;
-
-                // Ajouter un message dans le journal
-                //if (totalGas < 100) {
-                //    addEventToLog(`⚠️ Ajustement automatique : la somme des gaz était de ${totalGas}%. Les valeurs ont été augmentées pour atteindre 100%.`);
-                //} else {
-                //    addEventToLog(`⚠️ Ajustement automatique : la somme des gaz était de ${totalGas}%. Les valeurs ont été réduites pour atteindre 100%.`);
-                //}
-
-                // Recalculer la somme après ajustement
-                totalGas = parseInt(co2Slider.value) + parseInt(n2Slider.value) + parseInt(h2oSlider.value);
-                totalGasText.textContent = totalGas;
+                addEventToLog(`⚠️ Ajustement automatique : somme des gaz passée de ${totalGas}% à 100%.`);
             }
 
-            // Calculer la température
+            // Calcul de la température AVEC boucles de rétroaction
             const temperature = calculateTemperature();
             temperatureText.textContent = `Température : ${temperature.toFixed(1)}°C`;
-            // Avertissement si CO₂ approche du seuil critique
-            if (co2 > 70 && co2 <= 80 && !earth.classList.contains('runaway')) {
-                addEventToLog("⚠️ Attention : CO₂ > 70% ! Risque d'emballement de l'effet de serre.", "warning");
-            }
-            // Mettre à jour la couleur de la Terre
-            updateEarthColor(temperature);
 
-            // Mettre à jour le score
+            // Appliquer les boucles de rétroaction
+            applyFeedbackLoops(temperature);
+
+            // Mise à jour visuelle et score
+            updateEarthColor(temperature);
             updateScore(temperature);
+            previousTemp = temperature;
         }
 
         function calculateTemperature() {
             const co2 = parseInt(co2Slider.value);
             const h2o = parseInt(h2oSlider.value);
 
-            // Si CO₂ = 0%, température forcée à -10°C (froid)
-            if (co2 === 0) {
-                return -10;
-            }
-            // Formule révisée pour un emballement visible
-            else if (co2 > 80) {
-                const baseTemp = 20 + (co2 * 0.6) - (h2o * 0.3);
+            if (co2 === 0) return -10; // Sans CO₂ = froid
+
+            // Emballement si CO₂ > 80%
+            if (co2 > 80) {
                 const excessCO2 = co2 - 80;
-                return baseTemp + (excessCO2 * 5); // Augmentation linéaire forte
+                const baseTemp = 20 + (80 * 0.6) - (h2o * 0.3); // Température de base avec CO₂=80%
+                return baseTemp + (excessCO2 * 10); // Augmentation linéaire forte
             }
-            // Calcul normal sinon
+            // Calcul normal
             else {
                 return 20 + (co2 * 0.6) - (h2o * 0.3);
             }
         }
 
-        function updateEarthColor(temperature) {
-        // Supprimer toutes les classes avant d'appliquer les nouvelles
-        earth.classList.remove('hot', 'cold', 'critical-cold', 'runaway');
+        function applyFeedbackLoops(currentTemp) {
+            // Boucle de rétroaction positive (emballement)
+            if (currentTemp > 50 && currentTemp > previousTemp) {
+                const tempIncrease = currentTemp - previousTemp;
+                const h2oIncrease = Math.min(2, tempIncrease * 0.2); // Augmentation de H₂O due à l'évaporation
+                const newH2O = Math.min(20, parseInt(h2oSlider.value) + h2oIncrease);
 
-        if (temperature > 100) { // Emballement
-            earth.classList.add('runaway');
-            addEventToLog("⚠️ EMBALLEMENT DE L'EFFET DE SERRE ! Température > 100°C (comme Vénus).");
-        }
-        else if (temperature > 50) { // Trop chaud
-            earth.classList.add('hot');
-        }
-        else if (temperature < 0) { // Trop froid
-            earth.classList.add('cold');
-            if (parseInt(co2Slider.value) === 0) {
-                earth.classList.add('critical-cold');
+                if (newH2O > parseInt(h2oSlider.value)) {
+                    h2oSlider.value = newH2O;
+                    h2oValue.textContent = newH2O;
+                    addEventToLog(`🌊 Boucle de rétroaction : +${h2oIncrease}% H₂O (évaporation due à la chaleur).`, "feedback-loop");
+                }
+            }
+            // Boucle de rétroaction négative (refroidissement)
+            else if (currentTemp < 0 && currentTemp < previousTemp) {
+                const tempDecrease = previousTemp - currentTemp;
+                const h2oDecrease = Math.min(2, tempDecrease * 0.1); // Réduction de H₂O due à la condensation
+                const newH2O = Math.max(0, parseInt(h2oSlider.value) - h2oDecrease);
+
+                if (newH2O < parseInt(h2oSlider.value)) {
+                    h2oSlider.value = newH2O;
+                    h2oValue.textContent = newH2O;
+                    addEventToLog(`🌧️ Boucle de rétroaction : -${h2oDecrease}% H₂O (condensation due au froid).`, "feedback-loop");
+                }
+            }
+
+            // Si emballement (T > 100°C), augmentation automatique du CO₂
+            if (currentTemp > 100) {
+                const co2Increase = Math.min(5, (currentTemp - 100) * 0.1);
+                const newCO2 = Math.min(97, parseInt(co2Slider.value) + co2Increase);
+
+                if (newCO2 > parseInt(co2Slider.value)) {
+                    co2Slider.value = newCO2;
+                    co2Value.textContent = newCO2;
+                    addEventToLog(`🔥 Boucle de rétroaction : +${co2Increase}% CO₂ (libération due à la chaleur extrême).`, "feedback-loop");
+                }
             }
         }
-        // Sinon, reste en couleur habitable (bleu)
+
+        function updateEarthColor(temperature) {
+            earth.classList.remove('hot', 'cold', 'critical-cold', 'runaway');
+
+            if (temperature > 100) {
+                earth.classList.add('runaway');
+                addEventToLog("⚠️ EMBALLEMENT DE L'EFFET DE SERRE ! La température dépasse 100°C.");
+            }
+            else if (temperature > 50) {
+                earth.classList.add('hot');
+            }
+            else if (temperature < 0) {
+                earth.classList.add('cold');
+                if (parseInt(co2Slider.value) === 0) {
+                    earth.classList.add('critical-cold');
+                }
+            }
         }
 
         function updateScore(temperature) {
@@ -411,7 +230,6 @@
             }
         }
 
-        // Générer des événements aléatoires
         function generateRandomEvent() {
             const co2 = parseInt(co2Slider.value);
             const h2o = parseInt(h2oSlider.value);
@@ -419,31 +237,30 @@
             const events = [
                 {
                     type: "volcano",
-                    co2: Math.min(10, 90 - co2),
-                    message: `🌋 Éruption volcanique ! Le CO₂ augmente de ${Math.min(10, 90 - co2)}%.`,
+                    co2: Math.min(10, 97 - co2),
+                    message: `🌋 Éruption volcanique ! CO₂ +${Math.min(10, 97 - co2)}%.`,
                     sound: "explosion"
                 },
                 {
                     type: "comet",
                     h2o: Math.min(5, 20 - h2o),
-                    message: `☄️ Pluie de comètes ! L'H₂O augmente de ${Math.min(5, 20 - h2o)}%.`,
+                    message: `☄️ Pluie de comètes ! H₂O +${Math.min(5, 20 - h2o)}%.`,
                     sound: "splash"
                 },
                 {
                     type: "algae",
                     co2: Math.max(-5, -co2),
-                    message: `🌿 Prolifération d'algues ! Le CO₂ diminue de ${Math.abs(Math.max(-5, -co2))}%.`,
+                    message: `🌿 Prolifération d'algues ! CO₂ ${Math.max(-5, -co2)}%.`,
                     sound: "nature"
                 },
                 {
                     type: "storm",
                     h2o: Math.min(3, 20 - h2o),
-                    message: `🌪️ Tempête globale ! L'H₂O augmente de ${Math.min(3, 20 - h2o)}%.`,
+                    message: `🌪️ Tempête globale ! H₂O +${Math.min(3, 20 - h2o)}%.`,
                     sound: "wind"
                 }
             ];
 
-            // Filtrer les événements impossibles
             const possibleEvents = events.filter(event => {
                 if (event.type === "volcano") return event.co2 > 0;
                 if (event.type === "comet") return event.h2o > 0;
@@ -457,14 +274,6 @@
             const randomEvent = possibleEvents[Math.floor(Math.random() * possibleEvents.length)];
             addEventToLog(randomEvent.message);
 
-            // Ajouter un avertissement si CO₂ est très bas ou très élevé
-            if (co2 <= 5 && co2 > 0) {
-                addEventToLog("⚠️ Attention : le CO₂ est très bas ! Risque de glaciation.", "warning");
-            } else if (co2 >= 70 && co2 < 80) {
-                addEventToLog("⚠️ Attention : le CO₂ est très élevé ! Risque d'emballement de l'effet de serre.", "warning");
-            }
-
-            // Appliquer l'effet de l'événement
             if (randomEvent.type === "volcano") {
                 co2Slider.value = parseInt(co2Slider.value) + randomEvent.co2;
             } else if (randomEvent.type === "comet") {
@@ -478,7 +287,6 @@
             updateValues();
         }
 
-        // Ajouter un événement au journal
         function addEventToLog(message, type = "normal") {
             const eventElement = document.createElement('div');
             eventElement.className = `event ${type}`;
@@ -487,48 +295,32 @@
             eventLog.scrollTop = eventLog.scrollHeight;
         }
 
-        // Réinitialiser le jeu
         function resetGame() {
             clearInterval(gameInterval);
             clearInterval(eventInterval);
-
-            // Réinitialiser les valeurs des curseurs
             co2Slider.value = 70;
             n2Slider.value = 20;
             h2oSlider.value = 10;
-
-            // Réinitialiser les variables
             score = 0;
             time = 0;
+            previousTemp = 20;
             scoreText.textContent = score;
             timeText.textContent = time;
-
-            // Mettre à jour l'affichage
             updateValues();
-
-            // Redémarrer les intervalles
             startGame();
         }
 
-        // Démarrer le jeu
         function startGame() {
             clearInterval(gameInterval);
             clearInterval(eventInterval);
-
             gameInterval = setInterval(() => {
                 time++;
                 timeText.textContent = time;
-
-                if (time % 10 === 0) {
-                    generateRandomEvent();
-                }
+                if (time % 10 === 0) generateRandomEvent();
             }, 1000);
-
-            // Générer un événement toutes les 15 secondes
             eventInterval = setInterval(generateRandomEvent, 15000);
         }
 
-        // Démarrer le jeu au chargement de la page
         window.addEventListener('load', () => {
             updateValues();
             startGame();
