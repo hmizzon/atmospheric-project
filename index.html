@@ -243,7 +243,7 @@
             <p><strong>CO₂</strong> : Gaz à effet de serre. Sans CO₂ (0 %), la Terre gèle rapidement, comme Mars !</p>
             <p><strong>N₂</strong> : Gaz inerte. Stabilise l'atmosphère mais n'affecte pas directement la température.</p>
             <p><strong>H₂O</strong> : Vapeur d'eau. Contribue à l'effet de serre mais aussi aux nuages (refroidissement).</p>
-            <p><strong>Équilibre</strong> : Sur Terre primitive, un mélange de ces gaz a permis la vie.</p>
+            <p><strong>Équilibre</strong> : La somme des gaz est toujours ajustée à 100 % pour refléter une atmosphère réaliste.</p>
         </div>
     </div>
 
@@ -304,21 +304,38 @@
             h2oValue.textContent = h2oSlider.value;
 
             // Calculer la somme des gaz
-            const totalGas = parseInt(co2Slider.value) + parseInt(n2Slider.value) + parseInt(h2oSlider.value);
+            let totalGas = parseInt(co2Slider.value) + parseInt(n2Slider.value) + parseInt(h2oSlider.value);
             totalGasText.textContent = totalGas;
 
-            // Normaliser si la somme dépasse 100%
-            if (totalGas > 100) {
+            // Ajustement automatique de la somme des gaz
+            if (totalGas !== 100) {
                 const co2 = parseInt(co2Slider.value);
                 const n2 = parseInt(n2Slider.value);
                 const h2o = parseInt(h2oSlider.value);
 
+                // Calculer le ratio pour ajuster à 100 %
                 const ratio = 100 / totalGas;
-                co2Slider.value = Math.floor(co2 * ratio);
-                n2Slider.value = Math.floor(n2 * ratio);
-                h2oSlider.value = Math.floor(h2o * ratio);
 
-                addEventToLog("⚠️ Ajustement automatique : la somme des gaz dépassait 100 %.");
+                // Appliquer le ratio à chaque gaz (en gardant les limites min/max)
+                co2Slider.value = Math.min(90, Math.floor(co2 * ratio));
+                n2Slider.value = Math.min(90, Math.floor(n2 * ratio));
+                h2oSlider.value = Math.min(20, Math.floor(h2o * ratio));
+
+                // Mettre à jour les valeurs affichées après ajustement
+                co2Value.textContent = co2Slider.value;
+                n2Value.textContent = n2Slider.value;
+                h2oValue.textContent = h2oSlider.value;
+
+                // Ajouter un message dans le journal
+                if (totalGas < 100) {
+                    addEventToLog(`⚠️ Ajustement automatique : la somme des gaz était de ${totalGas}%. Les valeurs ont été augmentées pour atteindre 100%.`);
+                } else {
+                    addEventToLog(`⚠️ Ajustement automatique : la somme des gaz était de ${totalGas}%. Les valeurs ont été réduites pour atteindre 100%.`);
+                }
+
+                // Recalculer la somme après ajustement
+                totalGas = parseInt(co2Slider.value) + parseInt(n2Slider.value) + parseInt(h2oSlider.value);
+                totalGasText.textContent = totalGas;
             }
 
             // Calculer la température
