@@ -3,75 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goldilocks Atmosphère</title>
+    <title>Goldilocks Atmosphère - Équilibrez l'Atmosphère!</title>
     <style>
+        :root {
+            --habitable: #1E90FF;
+            --too-hot: #FF4500;
+            --too-cold: #ADD8E6;
+            --neutral: #f5f5f5;
+            --text-color: #2c3e50;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--neutral);
+            color: var(--text-color);
             margin: 0;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
-        h1 {
-            color: #2c3e50;
-        }
+
         .game-container {
-            max-width: 600px;
-            margin: 0 auto;
             background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: center;
         }
+
+        h1 {
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .earth-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+        }
+
+        #earth {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: var(--habitable);
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/800px-The_Earth_seen_from_Apollo_17.jpg');
+            background-size: cover;
+        }
+
+        .earth-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .hot::before {
+            background-color: rgba(255, 69, 0, 0.5);
+        }
+
+        .cold::before {
+            background-color: rgba(173, 216, 230, 0.5);
+        }
+
         .slider-container {
-            margin: 20px 0;
+            margin: 15px 0;
+            width: 100%;
         }
+
         .slider {
             width: 100%;
             max-width: 400px;
             margin: 10px auto;
         }
-        #earth {
-            width: 150px;
-            height: 150px;
-            margin: 20px auto;
-            border-radius: 50%;
-            background-color: #1E90FF; /* Bleu pour habitable */
-            transition: background-color 0.5s;
-        }
-        .hot {
-            background-color: #FF4500 !important; /* Rouge pour trop chaud */
-        }
-        .cold {
-            background-color: #ADD8E6 !important; /* Bleu clair pour trop froid */
-        }
-        .controls {
+
+        .slider-label {
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
+            justify-content: space-between;
+            margin: 0 20px;
+            font-weight: bold;
         }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
+
         #temperature {
             font-size: 24px;
             font-weight: bold;
             margin: 20px 0;
+            color: var(--text-color);
         }
+
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .event-log {
+            margin-top: 20px;
+            height: 100px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .event {
+            margin-bottom: 5px;
+            color: #555;
+        }
+
         .instructions {
             font-style: italic;
             color: #7f8c8d;
-            margin-top: 20px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                width: 95%;
+                padding: 15px;
+            }
         }
     </style>
 </head>
@@ -80,26 +193,56 @@
         <h1>Goldilocks Atmosphère</h1>
         <p>Ajuster les niveaux de gaz pour garder la Terre habitable !</p>
 
-        <div id="earth"></div>
+        <div class="earth-container">
+            <div id="earth"></div>
+        </div>
         <div id="temperature">Température : 20°C</div>
 
-        <div class="slider-container">
-            <p>CO₂ : <span id="co2-value">70</span>%</p>
-            <input type="range" id="co2" class="slider" min="0" max="100" value="70" step="5">
+        <div class="score-container">
+            <div>Score : <span id="score">0</span> secondes</div>
+            <div>Temps écoulé : <span id="time">0</span> secondes</div>
         </div>
 
         <div class="slider-container">
-            <p>N₂ : <span id="n2-value">20</span>%</p>
-            <input type="range" id="n2" class="slider" min="0" max="100" value="20" step="5">
+            <div class="slider-label">
+                <span>CO₂ : <span id="co2-value">70</span>%</span>
+            </div>
+            <input type="range" id="co2" class="slider" min="0" max="100" value="70" step="1">
         </div>
 
         <div class="slider-container">
-            <p>H₂O : <span id="h2o-value">10</span>%</p>
+            <div class="slider-label">
+                <span>N₂ : <span id="n2-value">20</span>%</span>
+            </div>
+            <input type="range" id="n2" class="slider" min="0" max="100" value="20" step="1">
+        </div>
+
+        <div class="slider-container">
+            <div class="slider-label">
+                <span>H₂O : <span id="h2o-value">10</span>%</span>
+            </div>
             <input type="range" id="h2o" class="slider" min="0" max="20" value="10" step="1">
         </div>
 
+        <div class="event-log" id="event-log">
+            <!-- Les événements s'afficheront ici -->
+        </div>
+
         <div class="instructions">
-            <p>Objectif : Maintenir la température entre 0°C et 50°C pour garder la Terre habitable !</p>
+            <p>Objectif : Maintenir la température entre 0°C et 50°C pendant au moins 30 secondes pour gagner !</p>
+            <button id="info-btn">Pourquoi ces gaz ?</button>
+        </div>
+    </div>
+
+    <!-- Modal pour les explications scientifiques -->
+    <div class="modal" id="info-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal">&times;</span>
+            <h2>Rôle des Gaz dans l'Atmosphère</h2>
+            <p><strong>CO₂</strong> : Gaz à effet de serre. Trop de CO₂ réchauffe la planète (comme sur Vénus).</p>
+            <p><strong>N₂</strong> : Gaz inerte. Stabilise l'atmosphère mais n'affecte pas directement la température.</p>
+            <p><strong>H₂O</strong> : Vapeur d'eau. Contribue à l'effet de serre mais aussi aux nuages (refroidissement).</p>
+            <p><strong>Équilibre</strong> : Sur Terre primitive, un mélange de ces gaz a permis la vie !</p>
         </div>
     </div>
 
@@ -113,23 +256,51 @@
         const h2oValue = document.getElementById('h2o-value');
         const temperatureText = document.getElementById('temperature');
         const earth = document.getElementById('earth');
+        const scoreText = document.getElementById('score');
+        const timeText = document.getElementById('time');
+        const eventLog = document.getElementById('event-log');
+        const infoBtn = document.getElementById('info-btn');
+        const infoModal = document.getElementById('info-modal');
+        const closeModal = document.getElementById('close-modal');
+
+        // Variables globales
+        let score = 0;
+        let time = 0;
+        let gameInterval;
+        let eventInterval;
 
         // Mettre à jour les valeurs affichées
         co2Slider.addEventListener('input', updateValues);
         n2Slider.addEventListener('input', updateValues);
         h2oSlider.addEventListener('input', updateValues);
 
+        // Bouton pour ouvrir la modal d'informations
+        infoBtn.addEventListener('click', () => {
+            infoModal.style.display = 'flex';
+        });
+
+        // Fermer la modal
+        closeModal.addEventListener('click', () => {
+            infoModal.style.display = 'none';
+        });
+
+        // Fermer la modal en cliquant en dehors
+        window.addEventListener('click', (e) => {
+            if (e.target === infoModal) {
+                infoModal.style.display = 'none';
+            }
+        });
+
         function updateValues() {
             co2Value.textContent = co2Slider.value;
             n2Value.textContent = n2Slider.value;
             h2oValue.textContent = h2oSlider.value;
 
-            // Calculer la température
             const temperature = calculateTemperature();
-            temperatureText.textContent = `Température : ${temperature}°C`;
+            temperatureText.textContent = `Température : ${temperature.toFixed(1)}°C`;
 
-            // Changer la couleur de la Terre
             updateEarthColor(temperature);
+            updateScore(temperature);
         }
 
         function calculateTemperature() {
@@ -137,9 +308,9 @@
             const n2 = parseInt(n2Slider.value);
             const h2o = parseInt(h2oSlider.value);
 
-            // Formule simplifiée pour le calcul de la température
-            // CO₂ réchauffe, H₂O refroidit légèrement, N₂ n'a pas d'effet direct
-            return 20 + (co2 * 0.5) - (h2o * 0.2);
+            // Formule améliorée pour le calcul de la température
+            // CO₂ a un effet de réchauffement fort, H₂O modère légèrement
+            return 20 + (co2 * 0.6) - (h2o * 0.3) + (Math.random() * 2 - 1); // Légère variation aléatoire
         }
 
         function updateEarthColor(temperature) {
@@ -154,8 +325,65 @@
             }
         }
 
-        // Initialiser les valeurs
-        updateValues();
+        function updateScore(temperature) {
+            if (temperature >= 0 && temperature <= 50) {
+                score++;
+                scoreText.textContent = score;
+            }
+        }
+
+        // Générer des événements aléatoires
+        function generateRandomEvent() {
+            const events = [
+                { type: "volcano", co2: 10, message: "🌋 Éruption volcanique ! Le CO₂ augmente de 10%.", sound: "explosion" },
+                { type: "comet", h2o: 5, message: "☄️ Pluie de comètes ! L'H₂O augmente de 5%.", sound: "splash" },
+                { type: "algae", co2: -5, message: "🌿 Prolifération d'algues ! Le CO₂ diminue de 5%.", sound: "nature" },
+                { type: "storm", h2o: 3, message: "🌪️ Tempête globale ! L'H₂O augmente de 3%.", sound: "wind" }
+            ];
+
+            const randomEvent = events[Math.floor(Math.random() * events.length)];
+            addEventToLog(randomEvent.message);
+
+            // Appliquer l'effet de l'événement
+            if (randomEvent.type === "volcano") {
+                co2Slider.value = Math.min(100, parseInt(co2Slider.value) + randomEvent.co2);
+            } else if (randomEvent.type === "comet") {
+                h2oSlider.value = Math.min(20, parseInt(h2oSlider.value) + randomEvent.h2o);
+            } else if (randomEvent.type === "algae") {
+                co2Slider.value = Math.max(0, parseInt(co2Slider.value) + randomEvent.co2);
+            } else if (randomEvent.type === "storm") {
+                h2oSlider.value = Math.min(20, parseInt(h2oSlider.value) + randomEvent.h2o);
+            }
+
+            updateValues();
+        }
+
+        // Ajouter un événement au journal
+        function addEventToLog(message) {
+            const eventElement = document.createElement('div');
+            eventElement.className = 'event';
+            eventElement.textContent = message;
+            eventLog.appendChild(eventElement);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+
+        // Démarrer le jeu
+        function startGame() {
+            gameInterval = setInterval(() => {
+                time++;
+                timeText.textContent = time;
+
+                if (time % 10 === 0) {
+                    generateRandomEvent();
+                }
+            }, 1000);
+        }
+
+        // Démarrer le jeu au chargement de la page
+        window.addEventListener('load', () => {
+            updateValues();
+            startGame();
+        });
     </script>
 </body>
 </html>
