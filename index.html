@@ -88,4 +88,74 @@
             <input type="range" id="co2" class="slider" min="0" max="100" value="70" step="5">
         </div>
 
-        <div class="slider-contain
+        <div class="slider-container">
+            <p>N₂ : <span id="n2-value">20</span>%</p>
+            <input type="range" id="n2" class="slider" min="0" max="100" value="20" step="5">
+        </div>
+
+        <div class="slider-container">
+            <p>H₂O : <span id="h2o-value">10</span>%</p>
+            <input type="range" id="h2o" class="slider" min="0" max="20" value="10" step="1">
+        </div>
+
+        <div class="instructions">
+            <p>Objectif : Maintenir la température entre 0°C et 50°C pour garder la Terre habitable !</p>
+        </div>
+    </div>
+
+    <script>
+        // Récupérer les éléments du DOM
+        const co2Slider = document.getElementById('co2');
+        const n2Slider = document.getElementById('n2');
+        const h2oSlider = document.getElementById('h2o');
+        const co2Value = document.getElementById('co2-value');
+        const n2Value = document.getElementById('n2-value');
+        const h2oValue = document.getElementById('h2o-value');
+        const temperatureText = document.getElementById('temperature');
+        const earth = document.getElementById('earth');
+
+        // Mettre à jour les valeurs affichées
+        co2Slider.addEventListener('input', updateValues);
+        n2Slider.addEventListener('input', updateValues);
+        h2oSlider.addEventListener('input', updateValues);
+
+        function updateValues() {
+            co2Value.textContent = co2Slider.value;
+            n2Value.textContent = n2Slider.value;
+            h2oValue.textContent = h2oSlider.value;
+
+            // Calculer la température
+            const temperature = calculateTemperature();
+            temperatureText.textContent = `Température : ${temperature}°C`;
+
+            // Changer la couleur de la Terre
+            updateEarthColor(temperature);
+        }
+
+        function calculateTemperature() {
+            const co2 = parseInt(co2Slider.value);
+            const n2 = parseInt(n2Slider.value);
+            const h2o = parseInt(h2oSlider.value);
+
+            // Formule simplifiée pour le calcul de la température
+            // CO₂ réchauffe, H₂O refroidit légèrement, N₂ n'a pas d'effet direct
+            return 20 + (co2 * 0.5) - (h2o * 0.2);
+        }
+
+        function updateEarthColor(temperature) {
+            if (temperature > 50) {
+                earth.classList.add('hot');
+                earth.classList.remove('cold');
+            } else if (temperature < 0) {
+                earth.classList.add('cold');
+                earth.classList.remove('hot');
+            } else {
+                earth.classList.remove('hot', 'cold');
+            }
+        }
+
+        // Initialiser les valeurs
+        updateValues();
+    </script>
+</body>
+</html>
