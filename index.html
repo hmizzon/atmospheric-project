@@ -9,6 +9,7 @@
             --habitable: #1E90FF;
             --too-hot: #FF4500;
             --too-cold: #ADD8E6;
+            --runaway: #8B0000;
             --neutral: #f5f5f5;
             --text-color: #2c3e50;
         }
@@ -52,7 +53,7 @@
             height: 100%;
             border-radius: 50%;
             background-color: var(--habitable);
-            transition: background-color 0.5s ease;
+            transition: all 0.5s ease;
         }
 
         .hot {
@@ -67,10 +68,21 @@
             animation: blink 1s infinite;
         }
 
+        .runaway {
+            background-color: var(--runaway) !important;
+            animation: pulse 1s infinite !important;
+        }
+
         @keyframes blink {
             0% { opacity: 1; }
             50% { opacity: 0.5; }
             100% { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
         .slider-container {
@@ -185,15 +197,6 @@
                 padding: 15px;
             }
         }
-        .runaway {
-            background-color: #8B0000 !important;
-            animation: pulse 1s infinite !important;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
     </style>
 </head>
 <body>
@@ -244,14 +247,15 @@
         </div>
     </div>
 
-    <!-- Modal mise à jour avec les explications scientifiques -->
+    <!-- Modal pour les explications scientifiques -->
     <div class="modal" id="info-modal">
         <div class="modal-content">
             <span class="close-modal" id="close-modal">&times;</span>
             <h2>Mécanismes Climatiques</h2>
-            <p><strong>CO₂</strong> : Gaz à effet de serre essentiel. Sans CO₂, la Terre deviendrait plus froide, mais pas forcément "comme Mars" (où le problème est surtout la faible pression atmosphérique). Une atmosphère sans CO₂ perdrait une partie de son effet de serre, mais d’autres gaz (comme la vapeur d’eau) jouent aussi un rôle.</p>
-            <p><strong>Emballement de l’effet de serre</strong> : Si le CO₂ dépasse 80 %, la température s’emballe (comme sur Vénus, avec 96 % de CO₂ et une pression écrasante). Résultat : une planète infernale (460°C sur Vénus !).</p>
-            <p><strong>Équilibre Terre</strong> : Notre planète a évité ce sort grâce à son cycle du carbone. Mais attention : un excès de CO₂ peut déclencher un emballement !</p>
+            <p><strong>CO₂</strong> : Gaz à effet de serre essentiel. Sans CO₂, la Terre deviendrait plus froide, mais le problème de Mars est surtout sa <strong>faible pression atmosphérique</strong>, pas seulement l'absence de CO₂. Une atmosphère sans CO₂ perdrait une partie de son effet de serre.</p>
+            <p><strong>Emballement de l'effet de serre</strong> : Si le CO₂ dépasse 80%, la température s'emballe (comme sur Vénus, avec 96% de CO₂ et une pression écrasante). Résultat : une planète infernale (460°C sur Vénus !).</p>
+            <p><strong>Équilibre Terre</strong> : Notre planète régule naturellement le CO₂ via les océans et les roches. Mais un excès peut perturber cet équilibre.</p>
+            <p><strong>Somme des gaz</strong> : Ce jeu ajuste automatiquement les valeurs pour que la somme reste à 100%, comme dans une atmosphère réelle.</p>
         </div>
     </div>
 
@@ -321,13 +325,13 @@
                 const n2 = parseInt(n2Slider.value);
                 const h2o = parseInt(h2oSlider.value);
 
-                // Calculer le ratio pour ajuster à 100 %
+                // Calculer le ratio pour ajuster à 100%
                 const ratio = 100 / totalGas;
 
-                // Appliquer le ratio à chaque gaz (en gardant les limites min/max)
-                co2Slider.value = Math.min(90, Math.floor(co2 * ratio));
-                n2Slider.value = Math.min(90, Math.floor(n2 * ratio));
-                h2oSlider.value = Math.min(20, Math.floor(h2o * ratio));
+                // Appliquer le ratio à chaque gaz (en respectant les limites min/max)
+                co2Slider.value = Math.min(90, Math.max(0, Math.floor(co2 * ratio)));
+                n2Slider.value = Math.min(90, Math.max(0, Math.floor(n2 * ratio)));
+                h2oSlider.value = Math.min(20, Math.max(0, Math.floor(h2o * ratio)));
 
                 // Mettre à jour les valeurs affichées après ajustement
                 co2Value.textContent = co2Slider.value;
@@ -357,26 +361,27 @@
             updateScore(temperature);
         }
 
-        // Fonction calculateTemperature() mise à jour
         function calculateTemperature() {
             const co2 = parseInt(co2Slider.value);
             const h2o = parseInt(h2oSlider.value);
 
+            // Si CO₂ = 0%, température forcée à -10°C (froid)
             if (co2 === 0) {
-                return -10; // Sans CO₂, froid mais pas "comme Mars"
+                return -10;
             }
+            // Emballement de l'effet de serre si CO₂ > 80%
             else if (co2 > 80) {
                 const excessCO2 = co2 - 80;
-                return 20 + (co2 * 0.6) - (h2o * 0.3) + (excessCO2 * excessCO2 * 0.1); // Emballement exponentiel
+                return 20 + (co2 * 0.6) - (h2o * 0.3) + (excessCO2 * excessCO2 * 0.1); // Augmentation exponentielle
             }
+            // Calcul normal sinon
             else {
                 return 20 + (co2 * 0.6) - (h2o * 0.3);
             }
         }
 
-        // Fonction updateEarthColor() mise à jour
         function updateEarthColor(temperature) {
-            if (temperature > 100) {
+            if (temperature > 100) { // Emballement de l'effet de serre
                 earth.classList.add('runaway');
                 earth.classList.remove('hot', 'cold', 'critical-cold');
             }
@@ -450,14 +455,13 @@
             const randomEvent = possibleEvents[Math.floor(Math.random() * possibleEvents.length)];
             addEventToLog(randomEvent.message);
 
-            // Ajouter un avertissement si CO₂ est très bas
+            // Ajouter un avertissement si CO₂ est très bas ou très élevé
             if (co2 <= 5 && co2 > 0) {
                 addEventToLog("⚠️ Attention : le CO₂ est très bas ! Risque de glaciation.", "warning");
+            } else if (co2 >= 70 && co2 < 80) {
+                addEventToLog("⚠️ Attention : le CO₂ est très élevé ! Risque d'emballement de l'effet de serre.", "warning");
             }
-            // Ajoutez l'avertissement pour CO₂ > 70 %
-            if (co2 >= 70 && co2 < 80) {
-                addEventToLog("⚠️ Attention : le CO₂ est très élevé ! Risque d’emballement de l’effet de serre.", "warning");
-            }
+
             // Appliquer l'effet de l'événement
             if (randomEvent.type === "volcano") {
                 co2Slider.value = parseInt(co2Slider.value) + randomEvent.co2;
@@ -472,7 +476,7 @@
             updateValues();
         }
 
-        // Ajouter un événement au journal (avec option pour les avertissements)
+        // Ajouter un événement au journal
         function addEventToLog(message, type = "normal") {
             const eventElement = document.createElement('div');
             eventElement.className = `event ${type}`;
