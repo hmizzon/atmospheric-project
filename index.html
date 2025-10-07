@@ -201,20 +201,21 @@
         <div class="score-container">
             <div>Score : <span id="score">0</span> secondes</div>
             <div>Temps écoulé : <span id="time">0</span> secondes</div>
+            <div>Somme des gaz : <span id="total-gas">100</span>%</div>
         </div>
 
         <div class="slider-container">
             <div class="slider-label">
                 <span>CO₂ : <span id="co2-value">70</span>%</span>
             </div>
-            <input type="range" id="co2" class="slider" min="0" max="100" value="70" step="1">
+            <input type="range" id="co2" class="slider" min="0" max="90" value="70" step="1">
         </div>
 
         <div class="slider-container">
             <div class="slider-label">
                 <span>N₂ : <span id="n2-value">20</span>%</span>
             </div>
-            <input type="range" id="n2" class="slider" min="0" max="100" value="20" step="1">
+            <input type="range" id="n2" class="slider" min="0" max="90" value="20" step="1">
         </div>
 
         <div class="slider-container">
@@ -231,6 +232,7 @@
         <div class="instructions">
             <p>Objectif : Maintenir la température entre 0°C et 50°C pendant au moins 30 secondes pour gagner !</p>
             <button id="info-btn">Pourquoi ces gaz ?</button>
+            <button id="reset-btn">Réinitialiser</button>
         </div>
     </div>
 
@@ -258,8 +260,10 @@
         const earth = document.getElementById('earth');
         const scoreText = document.getElementById('score');
         const timeText = document.getElementById('time');
+        const totalGasText = document.getElementById('total-gas');
         const eventLog = document.getElementById('event-log');
         const infoBtn = document.getElementById('info-btn');
+        const resetBtn = document.getElementById('reset-btn');
         const infoModal = document.getElementById('info-modal');
         const closeModal = document.getElementById('close-modal');
 
@@ -279,6 +283,9 @@
             infoModal.style.display = 'flex';
         });
 
+        // Bouton pour réinitialiser le jeu
+        resetBtn.addEventListener('click', resetGame);
+
         // Fermer la modal
         closeModal.addEventListener('click', () => {
             infoModal.style.display = 'none';
@@ -292,14 +299,37 @@
         });
 
         function updateValues() {
+            // Mettre à jour les valeurs affichées
             co2Value.textContent = co2Slider.value;
             n2Value.textContent = n2Slider.value;
             h2oValue.textContent = h2oSlider.value;
 
+            // Calculer la somme des gaz
+            const totalGas = parseInt(co2Slider.value) + parseInt(n2Slider.value) + parseInt(h2oSlider.value);
+            totalGasText.textContent = totalGas;
+
+            // Normaliser si la somme dépasse 100%
+            if (totalGas > 100) {
+                const co2 = parseInt(co2Slider.value);
+                const n2 = parseInt(n2Slider.value);
+                const h2o = parseInt(h2oSlider.value);
+
+                const ratio = 100 / totalGas;
+                co2Slider.value = Math.floor(co2 * ratio);
+                n2Slider.value = Math.floor(n2 * ratio);
+                h2oSlider.value = Math.floor(h2o * ratio);
+
+                addEventToLog("⚠️ Ajustement automatique : la somme des gaz dépassait 100 %.");
+            }
+
+            // Calculer la température
             const temperature = calculateTemperature();
             temperatureText.textContent = `Température : ${temperature.toFixed(1)}°C`;
 
+            // Mettre à jour la couleur de la Terre
             updateEarthColor(temperature);
+
+            // Mettre à jour le score
             updateScore(temperature);
         }
 
@@ -308,9 +338,8 @@
             const n2 = parseInt(n2Slider.value);
             const h2o = parseInt(h2oSlider.value);
 
-            // Formule améliorée pour le calcul de la température
-            // CO₂ a un effet de réchauffement fort, H₂O modère légèrement
-            return 20 + (co2 * 0.6) - (h2o * 0.3) + (Math.random() * 2 - 1); // Légère variation aléatoire
+            // Formule pour le calcul de la température
+            return 20 + (co2 * 0.6) - (h2o * 0.3);
         }
 
         function updateEarthColor(temperature) {
@@ -334,25 +363,59 @@
 
         // Générer des événements aléatoires
         function generateRandomEvent() {
+            const co2 = parseInt(co2Slider.value);
+            const h2o = parseInt(h2oSlider.value);
+
             const events = [
-                { type: "volcano", co2: 10, message: "🌋 Éruption volcanique ! Le CO₂ augmente de 10%.", sound: "explosion" },
-                { type: "comet", h2o: 5, message: "☄️ Pluie de comètes ! L'H₂O augmente de 5%.", sound: "splash" },
-                { type: "algae", co2: -5, message: "🌿 Prolifération d'algues ! Le CO₂ diminue de 5%.", sound: "nature" },
-                { type: "storm", h2o: 3, message: "🌪️ Tempête globale ! L'H₂O augmente de 3%.", sound: "wind" }
+                {
+                    type: "volcano",
+                    co2: Math.min(10, 90 - co2),
+                    message: `🌋 Éruption volcanique ! Le CO₂ augmente de ${Math.min(10, 90 - co2)}%.`,
+                    sound: "explosion"
+                },
+                {
+                    type: "comet",
+                    h2o: Math.min(5, 20 - h2o),
+                    message: `☄️ Pluie de comètes ! L'H₂O augmente de ${Math.min(5, 20 - h2o)}%.`,
+                    sound: "splash"
+                },
+                {
+                    type: "algae",
+                    co2: Math.max(-5, -co2),
+                    message: `🌿 Prolifération d'algues ! Le CO₂ diminue de ${Math.abs(Math.max(-5, -co2))}%.`,
+                    sound: "nature"
+                },
+                {
+                    type: "storm",
+                    h2o: Math.min(3, 20 - h2o),
+                    message: `🌪️ Tempête globale ! L'H₂O augmente de ${Math.min(3, 20 - h2o)}%.`,
+                    sound: "wind"
+                }
             ];
 
-            const randomEvent = events[Math.floor(Math.random() * events.length)];
+            // Filtrer les événements impossibles (ex. : CO₂ déjà à 90%)
+            const possibleEvents = events.filter(event => {
+                if (event.type === "volcano") return event.co2 > 0;
+                if (event.type === "comet") return event.h2o > 0;
+                if (event.type === "algae") return event.co2 < 0; // Toujours possible
+                if (event.type === "storm") return event.h2o > 0;
+                return true;
+            });
+
+            if (possibleEvents.length === 0) return; // Aucun événement possible
+
+            const randomEvent = possibleEvents[Math.floor(Math.random() * possibleEvents.length)];
             addEventToLog(randomEvent.message);
 
             // Appliquer l'effet de l'événement
             if (randomEvent.type === "volcano") {
-                co2Slider.value = Math.min(100, parseInt(co2Slider.value) + randomEvent.co2);
+                co2Slider.value = parseInt(co2Slider.value) + randomEvent.co2;
             } else if (randomEvent.type === "comet") {
-                h2oSlider.value = Math.min(20, parseInt(h2oSlider.value) + randomEvent.h2o);
+                h2oSlider.value = parseInt(h2oSlider.value) + randomEvent.h2o;
             } else if (randomEvent.type === "algae") {
                 co2Slider.value = Math.max(0, parseInt(co2Slider.value) + randomEvent.co2);
             } else if (randomEvent.type === "storm") {
-                h2oSlider.value = Math.min(20, parseInt(h2oSlider.value) + randomEvent.h2o);
+                h2oSlider.value = parseInt(h2oSlider.value) + randomEvent.h2o;
             }
 
             updateValues();
@@ -367,8 +430,34 @@
             eventLog.scrollTop = eventLog.scrollHeight;
         }
 
+        // Réinitialiser le jeu
+        function resetGame() {
+            clearInterval(gameInterval);
+            clearInterval(eventInterval);
+
+            // Réinitialiser les valeurs des curseurs
+            co2Slider.value = 70;
+            n2Slider.value = 20;
+            h2oSlider.value = 10;
+
+            // Réinitialiser les variables
+            score = 0;
+            time = 0;
+            scoreText.textContent = score;
+            timeText.textContent = time;
+
+            // Mettre à jour l'affichage
+            updateValues();
+
+            // Redémarrer les intervalles
+            startGame();
+        }
+
         // Démarrer le jeu
         function startGame() {
+            clearInterval(gameInterval);
+            clearInterval(eventInterval);
+
             gameInterval = setInterval(() => {
                 time++;
                 timeText.textContent = time;
@@ -377,6 +466,9 @@
                     generateRandomEvent();
                 }
             }, 1000);
+
+            // Générer un événement toutes les 10-20 secondes
+            eventInterval = setInterval(generateRandomEvent, 15000);
         }
 
         // Démarrer le jeu au chargement de la page
